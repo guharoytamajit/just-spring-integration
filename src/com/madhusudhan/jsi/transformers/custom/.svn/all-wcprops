@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/!svn/ver/446428/internal/books/9781449316082/current/code/js-integration/src/main/java/com/madhusudhan/jsi/transformers/custom
+END
+CustomTransformersTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 155
+/!svn/ver/446428/internal/books/9781449316082/current/code/js-integration/src/main/java/com/madhusudhan/jsi/transformers/custom/CustomTransformersTest.java
+END
+TradeMapTransformer.java
+K 25
+svn:wc:ra_dav:version-url
+V 152
+/!svn/ver/446428/internal/books/9781449316082/current/code/js-integration/src/main/java/com/madhusudhan/jsi/transformers/custom/TradeMapTransformer.java
+END
+PojoToStringTransformer.java
+K 25
+svn:wc:ra_dav:version-url
+V 156
+/!svn/ver/446428/internal/books/9781449316082/current/code/js-integration/src/main/java/com/madhusudhan/jsi/transformers/custom/PojoToStringTransformer.java
+END
+readme.txt
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/!svn/ver/446428/internal/books/9781449316082/current/code/js-integration/src/main/java/com/madhusudhan/jsi/transformers/custom/readme.txt
+END
+AnnotatedTradeMapTransformer.java
+K 25
+svn:wc:ra_dav:version-url
+V 161
+/!svn/ver/446428/internal/books/9781449316082/current/code/js-integration/src/main/java/com/madhusudhan/jsi/transformers/custom/AnnotatedTradeMapTransformer.java
+END

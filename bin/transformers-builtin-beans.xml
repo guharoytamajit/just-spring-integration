@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:core="http://activemq.apache.org/schema/core" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	    http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/integration 
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd 
+		http://www.springframework.org/schema/integration/stream 
+		http://www.springframework.org/schema/integration/stream/spring-integration-stream-2.1.xsd 
+		http://www.springframework.org/schema/integration/xml 
+        http://www.springframework.org/schema/integration/xml/spring-integration-xml-2.1.xsd">
+
+	<context:component-scan base-package="com.madhusudhan.jsi.flow.transformer" />
+
+	<int:publish-subscribe-channel id="in-channel"/>
+
+	<int:channel id="trades-out-channel">
+		<int:queue capacity="10" />
+	</int:channel>
+	<int-stream:stdout-channel-adapter
+		id="stdout" />
+		
+<!-- 	<int:object-to-string-transformer input-channel="in-channel" 
+		output-channel="stdout"/> 
+ -->
+	<int:object-to-map-transformer input-channel="in-channel" output-channel="stdout"/> 
+		
+
+	<!-- <int:payload-serializing-transformer input-channel="trades-in-channel" 
+		output-channel="trades-out-channel"></int:payload-serializing-transformer> -->
+
+	<!-- <int:payload-deserializing-transformer input-channel="trades-out-channel" 
+		output-channel="stdout"> </int:payload-deserializing-transformer> -->
+
+	<!-- <int:object-to-json-transformer input-channel="trades-in-channel" output-channel="trades-out-channel"> 
+		<int:poller fixed-delay="1000" /> </int:object-to-json-transformer> <int:json-to-object-transformer 
+		input-channel="trades-out-channel" output-channel="stdout" type="com.madhusudhan.jsi.domain.Trade"> 
+		</int:json-to-object-transformer> -->
+
+	<!-- ***** Xml Transformers START **** -->
+	<!-- <int-xml:marshalling-transformer input-channel="trades-in-channel" 
+		output-channel="stdout" marshaller="marshaller" result-type="StringResult"> 
+		</int-xml:marshalling-transformer> -->
+	<!-- <int-xml:unmarshalling-transformer input-channel="trades-out-channel" 
+		output-channel="stdout" unmarshaller="marshaller"> </int-xml:unmarshalling-transformer> -->
+	<!-- <int-xml:marshalling-transformer input-channel="trades-in-channel" 
+		output-channel="trades-out-channel-xml" marshaller="marshaller" result-factory="tradResultFactory"> 
+		 </int-xml:marshalling-transformer> <bean 
+		id="tradResultFactory" class="com.madhusudhan.jsi.ch3.ex3.TradeResultFactory" 
+		/> -->
+	<!-- <int-xml:marshalling-transformer input-channel="trades-in-channel-xml" 
+		output-channel="trades-out-channel-xml" marshaller="marshaller" result-transformer="resultTransformer"> 
+		 </int-xml:marshalling-transformer> <bean 
+		id="marshaller" class="org.springframework.oxm.castor.CastorMarshaller" /> -->
+	<!-- <bean id="resultTransformer" class="org.springframework.integration.xml.transformer.ResultToStringTransformer" 
+		/> -->
+	<!-- ***** Xml Transformers END **** -->
+
+	<!-- ***** XPath Transformers START **** -->
+    <!-- 
+	<int-xml:xpath-transformer input-channel="trades-in-channel"
+		output-channel="stdout" xpath-expression="/trade/@status">
+	</int-xml:xpath-transformer>
+	-->
+</beans>

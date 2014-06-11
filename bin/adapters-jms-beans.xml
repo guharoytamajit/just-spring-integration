@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:core="http://activemq.apache.org/schema/core" 
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xmlns:ftp="http://www.springframework.org/schema/integration/ftp"
+	xmlns:jms="http://www.springframework.org/schema/integration/jms"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	    http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+		http://www.springframework.org/schema/integration 
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd 
+		http://www.springframework.org/schema/integration/xml 
+        http://www.springframework.org/schema/integration/xml/spring-integration-xml-2.1.xsd 
+        http://www.springframework.org/schema/integration/file 
+        http://www.springframework.org/schema/integration/file/spring-integration-file-2.1.xsd
+        http://www.springframework.org/schema/integration/ftp 
+        http://www.springframework.org/schema/integration/ftp/spring-integration-ftp-2.1.xsd
+        http://www.springframework.org/schema/integration/jms 
+        http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.1.xsd">
+
+
+	<int:channel id="positions-channel">
+		<int:queue capacity="10" />
+	</int:channel>
+
+	<bean id="positionsQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="POSITIONS_QUEUE" />
+	</bean>
+	<bean name="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL">
+			<value>tcp://localhost:61616</value>
+		</property>
+	</bean>
+	<!-- Polling Consumer -->
+	
+	<jms:inbound-channel-adapter id="positionsJmsAdapter"
+		connection-factory="connectionFactory" destination="positionsQueue"
+		channel="positions-channel" message-converter="positionsConverter">
+		<int:poller fixed-rate="1000" />
+	</jms:inbound-channel-adapter>
+   
+	<!-- Event Driven consumer -->
+	
+	<jms:message-driven-channel-adapter
+		id="msgDrivenPositionsAdapter" connection-factory="connectionFactory"
+		destination="positionsQueue" channel="positions-channel" >
+	</jms:message-driven-channel-adapter>
+	
+    <!-- Outbound Adapter -->
+    <jms:outbound-channel-adapter channel="positions-channel"
+		connection-factory="connectionFactory"
+		destination="positionsQueue">
+		<int:poller fixed-rate="1000"/>
+	</jms:outbound-channel-adapter>
+
+<bean id="positionsConverter" 
+  class="com.madhusudhan.jsi.adapters.jms.PositionsConverter"/>
+</beans>

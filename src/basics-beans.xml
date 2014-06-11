@@ -1,0 +1,48 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:core="http://activemq.apache.org/schema/core" xmlns:amq-core="http://activemq.apache.org/schema/core"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xmlns:ftp="http://www.springframework.org/schema/integration/ftp"
+	xmlns:jms="http://www.springframework.org/schema/integration/jms"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	    http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://activemq.apache.org/schema/core 
+		http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd 
+		http://www.springframework.org/schema/integration 
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd 
+		http://www.springframework.org/schema/integration/xml 
+        http://www.springframework.org/schema/integration/xml/spring-integration-xml-2.1.xsd 
+        http://www.springframework.org/schema/integration/file 
+        http://www.springframework.org/schema/integration/file/spring-integration-file-2.1.xsd
+        http://www.springframework.org/schema/integration/ftp 
+        http://www.springframework.org/schema/integration/ftp/spring-integration-ftp-2.1.xsd
+        http://www.springframework.org/schema/integration/jms 
+        http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.1.xsd">
+
+	<int:channel id="trades-channel" />
+
+	<bean id="tradesQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="TRADES_QUEUE" />
+	</bean>
+
+	<bean name="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL">
+			<value>tcp://localhost:61616</value>
+		</property>
+	</bean>
+	<jms:inbound-channel-adapter id="tradesJmsAdapter"
+		connection-factory="connectionFactory" destination="tradesQueue"
+		channel="trades-channel">
+  		<int:poller fixed-rate="1000" />
+	</jms:inbound-channel-adapter>
+
+	<int:service-activator input-channel="trades-channel"
+		ref="newTradeProcessor" method="processNewTrade">
+	</int:service-activator>
+
+	<bean id="newTradeProcessor" class="com.madhusudhan.jsi.basics.NewTradeProcessor" />
+</beans>

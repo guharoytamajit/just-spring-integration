@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:core="http://activemq.apache.org/schema/core" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	    http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+		http://www.springframework.org/schema/integration 
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd 
+		http://www.springframework.org/schema/integration/xml 
+        http://www.springframework.org/schema/integration/xml/spring-integration-xml-2.1.xsd 
+        http://www.springframework.org/schema/integration/file 
+        http://www.springframework.org/schema/integration/file/spring-integration-file-2.1.xsd">
+
+
+	<int:channel id="positions-files-channel">
+		<int:queue capacity="10" />
+	</int:channel>
+	
+	<int:publish-subscribe-channel id="positions-file-channel-sub"/>
+	
+	<int:publish-subscribe-channel id="positions-file-channel-sub2"/>
+
+	<!-- simple bean -->
+
+	<!-- <bean id="positionsReader" class="org.springframework.integration.file.FileReadingMessageSource"> 
+		<property name="directory" value="/Users/mkonda/dev/ws/" /> </bean> -->
+	<!-- Adapter using namespace -->
+<!-- 	<file:inbound-channel-adapter id="positionsAdapter"
+		directory="/Users/mkonda/dev/ws/" channel="positions-file-channel-sub"
+		prevent-duplicates="true" filename-regex="[ABC]_positions.pos">
+		<file:nio-locker/> 
+		<file:locker ref="positionsLocker"/>
+		
+		<int:poller fixed-rate="1000"/>
+	</file:inbound-channel-adapter>
+ -->
+
+   <file:inbound-channel-adapter id="positionsAdapter"
+		directory="/Users/mkonda/dev/ws/" channel="positions-file-channel-sub">
+		<int:poller fixed-rate="1000"/>
+	</file:inbound-channel-adapter>
+
+    <file:outbound-channel-adapter directory="/Users/mkonda/dev/ws/tmp" channel="positions-file-channel-sub"/>
+
+<!-- <bean id="positionsLocker" class="com.madhusudhan.jsi.adapters.file.PositionsFileLocker"/>-->
+ 
+ </beans>

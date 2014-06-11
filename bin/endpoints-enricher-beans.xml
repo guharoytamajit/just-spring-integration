@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:core="http://activemq.apache.org/schema/core" xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	    http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/integration 
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd 
+		http://www.springframework.org/schema/integration/xml 
+        http://www.springframework.org/schema/integration/xml/spring-integration-xml-2.1.xsd
+        http://www.springframework.org/schema/integration/stream
+        http://www.springframework.org/schema/integration/stream/spring-integration-stream-2.1.xsd">
+
+
+	<int:publish-subscribe-channel id="in-channel" />
+
+	<int:publish-subscribe-channel id="out-channel" />
+
+	<int-stream:stdout-channel-adapter
+		id="stdout" />
+
+	<int:channel id="reply-channel">
+		<int:queue capacity="10" />
+	</int:channel>
+
+	<int:publish-subscribe-channel id="myErrorChannel" />
+	 
+	<!-- ## Simple enricher that enriches the headers only ## -->
+	<int:header-enricher id="mini-enricher"
+		input-channel="in-channel" output-channel="out-channel">
+		<int:header name="SRC_SYSTEM" value="BBG" />
+		<int:header name="TARGET_SYSTEM" value="LOCAL" />
+	</int:header-enricher>
+	
+	<!-- ## Advanced enricher that enriches the headers with additional attributes ## -->
+	<int:header-enricher id="maxi-enricher"
+		input-channel="in-channel" output-channel="out-channel">
+		<int:priority value="10" />
+		<int:error-channel ref="myErrorChannel" />
+		<int:correlation-id value="APP_OWN_ID" />
+		<int:reply-channel value="reply-channel" />
+		<int:header name="SRC_SYSTEM" value="BBG" />
+		<int:header name="TARGET_SYSTEM" value="LOCAL" />
+	</int:header-enricher>
+	
+	<!-- ## Enricher that enriches the headers with the help of a bean ## -->
+	<int:header-enricher id="pojo-enricher"
+		input-channel="in-channel" output-channel="out-channel">
+		<int:header name="SRC_SYSTSTM" ref="priceEnricher" method="enrichHeader" />
+	</int:header-enricher>
+
+	<!-- ## Simple enricher that enriches the headers using Spring Expressions ## -->
+	<int:enricher input-channel="in-channel" request-channel="enricher-req-channel"
+		output-channel="stdout">
+		<int:property name="price" expression="payload.price" />
+		<int:property name="instrument" expression="payload.instrument" />
+	</int:enricher>
+	
+	<!-- ## Service activator listening on out-channel 
+	     calling priceOutputter to log the message headers to stdout ##
+	-->
+	<int:service-activator input-channel="out-channel"
+		ref="priceOutputter"></int:service-activator>
+
+	<!-- ## Service activator listening on enricher-req-channel 
+	     calling priceEnricher to enrich the message ##
+	-->
+	<int:service-activator input-channel="enricher-req-channel"
+		ref="priceEnricher"></int:service-activator>
+
+	<bean id="priceOutputter" class="com.madhusudhan.jsi.endpoints.enricher.PriceOutputter" />
+
+	<bean id="priceEnricher" class="com.madhusudhan.jsi.endpoints.enricher.PriceEnricher" />
+</beans>
